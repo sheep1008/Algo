@@ -1,13 +1,19 @@
 def solution(n):
     answer = 0
-    for i in range(1, n//2+1):
-        s = i
-        for j in range(i+1, n//2+2):
-            s += j
-            if s == n:
-                answer += 1
-                break
-            elif s > n:
-                break
-    answer += 1
+    start = 1
+    end = 1
+    current_sum = 1
+    
+    while end <= n:
+        if current_sum == n:
+            answer += 1
+            current_sum -= start
+            start += 1
+        elif current_sum < n:
+            end += 1
+            current_sum += end
+        else:
+            current_sum -= start
+            start += 1
+            
     return answer
