@@ -1,12 +1,12 @@
 def solution(s):
-    li = []
-    for c in s:
-        if c == '(':
-            li.append(c)
+    stack = []
+    
+    for char in s:
+        if char == '(':
+            stack.append(char)
         else:
-            if not li:
+            if not stack:
                 return False
-            elif li[-1] == '(':
-                li.pop()
-                
-    return not li
+            stack.pop()
+
+    return len(stack) == 0
