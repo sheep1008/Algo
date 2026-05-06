@@ -1,2 +1,8 @@
 def solution(sizes):
-    return max(max(x) for x in sizes) * max(min(x) for x in sizes)
+    maximum = []
+    minimum = []
+    for w, h in sizes:
+        maximum.append(max(w, h))
+        minimum.append(min(w, h))
+        
+    return max(maximum)*max(minimum)
