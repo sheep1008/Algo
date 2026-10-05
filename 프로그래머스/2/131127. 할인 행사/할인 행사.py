@@ -5,37 +5,18 @@
 4. 제일 앞에 있는 것만 추가하고 다시 복원하면
 """
 def solution(want, number, discount):
+    want_dict = {}
+    for i in range(len(want)):
+        want_dict[want[i]] = number[i]
+        
     answer = 0
-    dic = dict()
-    for idx in range(len(number)):
-        dic[want[idx]] = number[idx]
-        
-    for idx in range(10):
-        if discount[idx] in dic:
-            dic[discount[idx]] -= 1
     
-    start_idx = 0
-    for idx in range(10, len(discount)):
-        count = 0
-        for value in dic.values():
-            if value == 0:
-                count += 1
+    for i in range(len(discount) - 9):
+        discount_10d = {}
         
-        if count == len(number):
+        for j in range(i, i+10):
+            if discount[j] in want_dict:
+                discount_10d[discount[j]] = discount_10d.get(discount[j], 0) + 1
+        if discount_10d == want_dict:
             answer += 1
-        
-        if discount[start_idx] in dic:
-            dic[discount[start_idx]] += 1
-        
-        if discount[idx] in dic:
-            dic[discount[idx]] -= 1
-            
-        start_idx += 1
-        
-    count = 0
-    for value in dic.values():
-        if value == 0:
-            count += 1
-    if count == len(number):
-        answer += 1
     return answer
