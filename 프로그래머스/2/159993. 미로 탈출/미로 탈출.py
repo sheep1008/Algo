@@ -1,76 +1,43 @@
-dr = [0, 1, 0, -1]
-dc = [1, 0, -1, 0]
-
 from collections import deque
+def is_valid_move(nx, ny, n, m, maps):
+    return 0 <= ny < n and 0 <= nx < m and maps[ny][nx] != 'X'
 
-def find_lever(row, col, board):
-    visited = [[False] * len(board[0]) for _ in range(len(board))]
-    visited[row][col] = True
-    queue = deque([(row, col, 0)])
-    
-    while queue:
-        curr_row, curr_col, curr_time = queue.popleft()
-        for idx in range(4):
-            nr = curr_row + dr[idx]
-            nc = curr_col + dc[idx]
-            if nr < 0 or nr >=len(board) or nc < 0 or nc >= len(board[0]):
-                continue
-            if visited[nr][nc]:
-                continue
-            
-            if board[nr][nc] == 'L':
-                return nr, nc, curr_time+1
-            
-            if board[nr][nc] != 'X':
-                visited[nr][nc] = True
-                queue.append((nr, nc, curr_time+1))
-            
-    return False
-
-def find_exit(row, col, board, time):
-    visited = [[False] * len(board[0]) for _ in range(len(board))]
-    visited[row][col] = True
-    queue = deque([(row, col, time)])
-    
-    while queue:
-        curr_row, curr_col, curr_time = queue.popleft()
+def append_to_queue(ny, nx, k, time, visited, q):
+    if not visited[ny][nx][k]:
+        visited[ny][nx][k] = True
+        q.append((ny, nx, k, time + 1))
         
-        for idx in range(4):
-            nr = curr_row + dr[idx]
-            nc = curr_col + dc[idx]
-            if nr < 0 or nr >=len(board) or nc < 0 or nc >= len(board[0]):
-                continue
-            if visited[nr][nc]:
-                continue
-            
-            if board[nr][nc] == 'E':
-                return nr, nc, curr_time+1
-            
-            if board[nr][nc] != 'X':
-                visited[nr][nc] = True
-                queue.append((nr, nc, curr_time+1))
-            
-    return False
-
 def solution(maps):
-    answer = 0
-    curr_row, curr_col = 0, 0
-    board = []
+    n, m = len(maps), len(maps[0])
+    visited = [[[False for _ in range(2)] for _ in range(m)] for _ in range(n)]
     
-    for row in range(len(maps)):
-        array = list(maps[row])
-        if 'S' in array:
-            curr_row, curr_col = row, array.index('S')
-
-        board.append(array)
+    dy = [-1, 1, 0, 0]
+    dx = [0, 0, -1, 1]
+    q = deque()
+    end_y, end_x = -1, -1
     
-    lever_inform = find_lever(curr_row, curr_col, board)
-    if not lever_inform:
-        return -1
-    
-    exit_inform = find_exit(lever_inform[0], lever_inform[1], board, lever_inform[2])
-    
-    if not exit_inform:
-        return -1
-    
-    return exit_inform[2]
+    for i in range(n):
+        for j in range(m):
+            if maps[i][j] == 'S':
+                q.append((i, j, 0, 0))
+                visited[i][j][0] = True
+            if maps[i][j] == 'E':
+                end_y, end_x = i, j
+                
+    while q:
+        y, x, k, time = q.popleft()
+        
+        if y == end_y and x == end_x and k == 1:
+            return time
+        
+        for i in range(4):
+            ny, nx = y + dy[i], x+dx[i]
+            if not is_valid_move(nx, ny, n, m, maps):
+                continue
+                
+            if maps[ny][nx] == 'L':
+                append_to_queue(ny, nx, 1, time, visited, q)
+                
+            else:
+                append_to_queue(ny, nx, k, time, visited, q)
+    return -1
