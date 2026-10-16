@@ -1,6 +1,3 @@
-import sys
-sys.setrecursionlimit(10000)
-
 class Node:
     def __init__(self, x, y, key):
         self.x = x
@@ -31,19 +28,31 @@ class BST:
                     return
                 current_node = current_node.right
 
-def preorder(node, result):
-    if node is None:
-        return
-    result.append(node.val)
-    preorder(node.left, result)
-    preorder(node.right, result)
+def preorder(root):
+    result = []
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        result.append(node.val)
+        if node.right:
+            stack.append(node.right)
+        if node.left:
+            stack.append(node.left)
+    return result
 
-def postorder(node, result):
-    if node is None:
-        return
-    postorder(node.left, result)
-    postorder(node.right, result)
-    result.append(node.val)
+
+def postorder(root):
+    result = []
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        result.append(node.val)
+        if node.left:
+            stack.append(node.left)
+        if node.right:
+            stack.append(node.right)
+    result.reverse()
+    return result
 
 def solution(nodeinfo):
     node_list = []
@@ -55,9 +64,7 @@ def solution(nodeinfo):
     for node_number, x, y in node_list:
         bst.insert(x, y, node_number)
         
-    preorder_result = []
-    postorder_result = []
-    preorder(bst.root, preorder_result)
-    postorder(bst.root, postorder_result)
-    
+    preorder_result = preorder(bst.root)
+    postorder_result = postorder(bst.root)
+
     return [preorder_result, postorder_result]
