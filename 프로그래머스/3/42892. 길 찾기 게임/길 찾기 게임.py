@@ -1,70 +1,71 @@
 class Node:
-    def __init__(self, x, y, key):
-        self.x = x
-        self.y = y
-        self.val = key
-        self.left = None
-        self.right = None
+    def __init__(self, info, num, left=None, right=None):
+        self.info = info
+        self.num = num
+        self.left = left
+        self.right = right
         
-class BST:
-    def __init__(self):
-        self.root = None
+    def has_left(self):
+        return self.left is not None
     
-    def insert(self, x, y, key):
-        if not self.root:
-            self.root = Node(x, y, key)
-            return
+    def has_right(self):
+        return self.right is not None
+    
+def make_BT(nodeinfo):
+    nodes = [i for i in range(1, len(nodeinfo) + 1)]
+    nodes.sort(key=lambda x: (nodeinfo[x-1][1], -nodeinfo[x-1][0]), reverse=True)
+    
+    root = None
+    for i in range(len(nodes)):
+        if root is None:
+            root = Node(nodeinfo[nodes[0]-1], nodes[0])
+            continue
         
-        current_node = self.root
+        parent = root
+        node = Node(nodeinfo[nodes[i]-1], nodes[i])
         while True:
-            if current_node.x > x:
-                if not current_node.left:
-                    current_node.left = Node(x, y, key)
-                    return
-                current_node = current_node.left
+            if parent.info[0] > node.info[0]:
+                if parent.has_left():
+                    parent = parent.left
+                    continue
+                parent.left = node
+                break
             else:
-                if not current_node.right:
-                    current_node.right = Node(x, y, key)
-                    return
-                current_node = current_node.right
+                if parent.has_right():
+                    parent = parent.right
+                    continue
+                parent.right = node
+                break
+    return root
 
-def preorder(root):
-    result = []
+def preorder(root, answer):
     stack = [root]
     while stack:
         node = stack.pop()
-        result.append(node.val)
-        if node.right:
-            stack.append(node.right)
-        if node.left:
-            stack.append(node.left)
-    return result
-
-
-def postorder(root):
-    result = []
-    stack = [root]
-    while stack:
-        node = stack.pop()
-        result.append(node.val)
-        if node.left:
-            stack.append(node.left)
-        if node.right:
-            stack.append(node.right)
-    result.reverse()
-    return result
-
-def solution(nodeinfo):
-    node_list = []
-    bst = BST()
-    for index, (x, y) in enumerate(nodeinfo):
-        node_list.append((index + 1, x, y))
-    node_list.sort(key=lambda node: -node[2])
-    
-    for node_number, x, y in node_list:
-        bst.insert(x, y, node_number)
+        if node is None:
+            continue
+        answer[0].append(node.num)
+        stack.append(node.right)
+        stack.append(node.left)
         
-    preorder_result = preorder(bst.root)
-    postorder_result = postorder(bst.root)
-
-    return [preorder_result, postorder_result]
+def postorder(root, answer):
+    stack = [(root, False)]
+    
+    while stack:
+        node, visited = stack.pop()
+        if node is None:
+            continue
+        if visited:
+            answer[1].append(node.num)
+            continue
+        stack.append((node, True))
+        stack.append((node.right, False))
+        stack.append((node.left, False))
+        
+def solution(nodeinfo):
+    answer = [[], []]
+    root = make_BT(nodeinfo)
+    preorder(root, answer)
+    postorder(root, answer)
+    
+    return answer
