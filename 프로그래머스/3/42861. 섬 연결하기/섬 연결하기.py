@@ -1,30 +1,25 @@
-def find_parent(parent, x):
-    if parent[x] != x:
-        parent[x] = find_parent(parent, parent[x])
-    return parent[x]
+def find(x, parents):
+    if x!= parents[x]:
+        parents[x] = find(parents[x], parents)
+    return parents[x]
 
-def union_parent(parent, a, b):
-    a = find_parent(parent, a)
-    b = find_parent(parent, b)
-    if a< b:
-        parent[b] = a
-    else:
-        parent[a] = b
-        
+def union(answer, cost, parents):
+    root1 = find(cost[0], parents)
+    root2 = find(cost[1], parents)
+    
+    if root1 != root2:
+        parents[root2] = root1
+        answer += cost[2]
+    
+    return answer
+
 def solution(n, costs):
+    # 비용 순으로 오름차순 정렬
     costs.sort(key=lambda x: x[2])
-    
-    parent = [i for i in range(n)]
-    total_cost = 0
-    bridge_count = 0
-    
-    for u, v, cost in costs:
-        if find_parent(parent, u) != find_parent(parent, v):
-            union_parent(parent, u, v)
-            total_cost += cost
-            bridge_count += 1
-            
-            if bridge_count == n-1:
-                break
-                
-    return total_cost
+    parents = list(range(n+1))
+    answer = 0
+    # 하나씩 돌면서 연결이 안되어 있으면 비용 추가
+    for cost in costs:
+        answer = union(answer, cost, parents)
+        
+    return answer
