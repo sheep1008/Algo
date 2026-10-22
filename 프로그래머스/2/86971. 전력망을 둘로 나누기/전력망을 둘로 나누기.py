@@ -1,28 +1,32 @@
-def dfs(current, skip, graph, visited, count):
-    visited[current] = True
-    for next_node in graph[current]:
-        if visited[next_node] or next_node == skip:
-            continue
-        count += 1
-        count = dfs(next_node, skip, graph, visited, count)
-    
-    return count
+def build_graph(n, wires):
+    graph = [[] for _ in range(n+1)]
+    for a, b in wires:
+        graph[a].append(b)
+        graph[b].append(a)
+    return graph
 
-from collections import defaultdict
+def dfs(node, parent, graph):
+    cnt = 1
+    for child in graph[node]:
+        if child != parent:
+            cnt += dfs(child, node, graph)
+        
+    return cnt
 
 def solution(n, wires):
-    answer = float('inf')
-    graph = defaultdict(list)
+    graph = build_graph(n, wires)
+    min_diff = float('inf')
     
-    for node1, node2 in wires:
-        graph[node1].append(node2)
-        graph[node2].append(node1)
+    for a, b in wires:
+        graph[a].remove(b)
+        graph[b].remove(a)
         
-    for wire in wires:
-        visited = [False] * (n+1)
-        count1 = dfs(wire[0], wire[1], graph, visited, 0)
-        count2 = dfs(wire[1], wire[0], graph, visited, 0)
+        cnt_a = dfs(a, b, graph)
+        cnt_b = n - cnt_a
         
-        answer = min(answer, abs(count1-count2))
+        min_diff = min(min_diff, abs(cnt_a - cnt_b))
         
-    return answer
+        graph[a].append(b)
+        graph[b].append(a)
+    
+    return min_diff
