@@ -1,17 +1,19 @@
-from itertools import permutations
+def dfs(current_k, cnt, dungeons, visited):
+    answer_max = cnt
+    
+    for idx in range(len(dungeons)):
+        if current_k < dungeons[idx][0] or visited[idx]:
+            continue
+        visited[idx] = True
+        answer_max = max(
+            answer_max,
+            dfs(current_k - dungeons[idx][1], cnt+1, dungeons, visited)
+        )
+        visited[idx] = False
+    
+    return answer_max
 
 def solution(k, dungeons):
-    answer = -1
-    
-    # 던전 방문 수를 순열로 만든다.
-    for permutation in permutations(dungeons):
-        hp = k
-        count = 0
-        for min_have, cost in permutation:
-            if hp < min_have:
-                continue
-            hp -= cost
-            count += 1
-            
-        answer = max(answer, count)
+    visited = [False] * len(dungeons)
+    answer = dfs(k, 0, dungeons, visited)
     return answer
