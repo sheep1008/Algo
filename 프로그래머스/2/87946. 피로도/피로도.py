@@ -1,18 +1,17 @@
 from itertools import permutations
 
 def solution(k, dungeons):
-    answer = 0
+    answer = -1
     
-    for p in permutations(dungeons, len(dungeons)):
-        current_k = k
+    # 던전 방문 수를 순열로 만든다.
+    for permutation in permutations(dungeons):
+        hp = k
         count = 0
-        
-        for min_need, spend in p:
-            if current_k >= min_need:
-                current_k -= spend
-                count += 1
-            else:
-                break
-                
+        for min_have, cost in permutation:
+            if hp < min_have:
+                continue
+            hp -= cost
+            count += 1
+            
         answer = max(answer, count)
     return answer
